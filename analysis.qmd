@@ -20,6 +20,9 @@ billboard <- read_csv("data/billboard.csv", show_col_types = FALSE)
 ```
 
 ```{r}
+#| message: false
+#| warning: false
+
 top_10_songs <- billboard |>
   pivot_longer(
     cols = starts_with("wk"),
@@ -35,19 +38,21 @@ notable_songs <- top_10_songs |>
   mutate(song = paste0(track, " (", artist, ")"))
 
 ggplot(top_10_songs, aes(x = week, y = rank, group = track)) +
-  geom_line(color = "gray75", alpha = 0.6) +
+  geom_line(color = "gray80", alpha = 0.6) +
   geom_line(
     data = notable_songs,
     aes(color = song),
-    linewidth = 1.1
+    linewidth = 1.2
   ) +
-  scale_y_reverse() +
+  scale_y_reverse(breaks = c(1, 10, 25, 50, 75, 100)) +
   labs(
-    title = "Billboard Hot 100 Trajectories of Top-10 Songs",
+    title = "Billboard Hot 100 Trajectories of Top-10 Songs (2000)",
     subtitle = "Highlighting the fastest to #1, slowest to #1, and longest chart run",
     x = "Week on Chart",
-    y = "Rank",
-    color = "Notable Songs"
+    y = "Billboard Rank",
+    color = "Notable Songs",
+    caption = "Source: Billboard Hot 100 (2000) via tidyr::billboard"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "bottom")
 ```
