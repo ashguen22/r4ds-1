@@ -1,5 +1,53 @@
 ---
 title: "Billboard Hot 100"
-author: "Ashlan Guengerich"
+author: "ashguen22"
 format: html
+execute:
+  echo: false
 ---
+
+```{r}
+#| message: false
+
+library(tidyverse)
+```
+
+```{r}
+#| cache: true
+#| message: false
+
+billboard <- read_csv("data/billboard.csv", show_col_types = FALSE)
+```
+
+```{r}
+top_10_songs <- billboard |>
+  pivot_longer(
+    cols = starts_with("wk"),
+    names_to = "week",
+    values_to = "rank",
+    values_drop_na = TRUE
+  ) |>
+  mutate(week = parse_number(week)) |>
+  filter(min(rank) <= 10, .by = c(artist, track, date.entered))
+
+notable_songs <- top_10_songs |>
+  filter(track %in% c("Music", "Amazed", "Higher")) |>
+  mutate(song = paste0(track, " (", artist, ")"))
+
+ggplot(top_10_songs, aes(x = week, y = rank, group = track)) +
+  geom_line(color = "gray75", alpha = 0.6) +
+  geom_line(
+    data = notable_songs,
+    aes(color = song),
+    linewidth = 1.1
+  ) +
+  scale_y_reverse() +
+  labs(
+    title = "Billboard Hot 100 Trajectories of Top-10 Songs",
+    subtitle = "Highlighting the fastest to #1, slowest to #1, and longest chart run",
+    x = "Week on Chart",
+    y = "Rank",
+    color = "Notable Songs"
+  ) +
+  theme_minimal()
+```
